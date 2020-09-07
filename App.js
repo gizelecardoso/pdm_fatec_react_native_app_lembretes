@@ -1,48 +1,42 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState} from 'react';
 import { StyleSheet, Text, View, TextInput, Button, ScrollView, FlatList } from 'react-native';
+import LembreteItem from './components/LembreteItem';
+import LembreteInput from './components/LembreteInput';
 
 export default function App() {
-  const[lembrete, setLembrete] = useState('');
   const[lembretes, setLembretes] = useState([]);
   const [contadorLembretes, setContadorLembretes] = useState(0);
 
-  //captura o texto digitado
-  const capturarLembrete = (lembrete) => {setLembrete(lembrete)}
-
   //para adicionar o que foi digitado
-  const adicionarLembrete = () => {
+  const adicionarLembrete = (lembrete) => {
     setLembretes((lembretes) => {
-    console.log(lembretes);
     setContadorLembretes(contadorLembretes + 1);
     return [...lembretes, {key: contadorLembretes.toString(), value:lembrete}];
   });
 }
 
+const removerLembrete = (keyASerRemovida) => {
+  setLembretes (lembretes => {
+    return lembretes.filter((lembrete) => {
+      return lembrete.key !== keyASerRemovida
+    })
+  });
+}
+
   return (
     <View style={styles.telaPrincipalView}>
-      <View style={styles.lembreteView}>
-        {/* usuário irá inserir lembretes aqui*/}
-        <TextInput placeholder="Lembrar..." style={styles.lembreteInputText}
-        onChangeText={capturarLembrete}
-        value={lembrete}
-        />
-        <Button title ="+" 
-        onPress={adicionarLembrete}
-        />
-      </View>
-      <View>
+      <LembreteInput onAdicionarLembrete={adicionarLembrete}/>
         <FlatList
           data={lembretes}
           renderItem={
             lembrete => 
-            <View style={styles.itemNaLista}>
-              <Text>{lembrete.item.value}</Text>
-            </View>
+            <LembreteItem 
+              chave={lembrete.item.key} 
+              lembrete={lembrete.item.value}
+              onDelete = {removerLembrete}/>
           }
         />
-        
-      </View>
     </View>
   );
 }
